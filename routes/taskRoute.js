@@ -6,10 +6,10 @@ const Column = require('../models/ColumnSchema')
 taskRouter.post('/move_task/:columnId', async (req, res, next) => {
   const columnId = req.params.columnId
   const { taskId, to, from } = req.body
+  console.log(taskId)
   let newTaskOrder = []
   try {
-    await Column.findById({ _id: columnId })
-    .then((doc, err) => {
+    await Column.findById({ _id: columnId }).then((doc, err) => {
       if (err) {
         return res.status(500).json({
           message: {
@@ -67,6 +67,8 @@ taskRouter.post('/add_task/:columnId', async (req, res, next) => {
         })
       }
 
+      newTaskOrder.push(taskDocument._id)
+
       await Column.findById({ _id: columnId })
         .populate('tasks')
         .exec()
@@ -82,8 +84,6 @@ taskRouter.post('/add_task/:columnId', async (req, res, next) => {
           }
           doc.tasks.forEach(task => newTaskOrder.push(task))
         })
-
-      newTaskOrder.push(taskDocument._id)
 
       await Column.updateOne(
         { _id: columnId },
